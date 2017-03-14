@@ -64,6 +64,5 @@ int startServer () {
 int main () {
     printf ("RainbowDash v1.0 Commander\n");
     startServer();
-    printf("BotNet");
     return 0;
 }
