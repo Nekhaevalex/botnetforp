@@ -25,6 +25,7 @@
 /* Begin PBXFileReference section */
 		83B83A661E68B2C6000331B3 /* RainbowDash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RainbowDash; sourceTree = BUILT_PRODUCTS_DIR; };
 		83B83A691E68B2C6000331B3 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		83B83A731E68C258000331B3 /* colors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = colors.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +58,7 @@
 		83B83A681E68B2C6000331B3 /* RainbowDash */ = {
 			isa = PBXGroup;
 			children = (
+				83B83A731E68C258000331B3 /* colors.h */,
 				83B83A691E68B2C6000331B3 /* main.c */,
 			);
 			path = RainbowDash;
@@ -246,6 +248,7 @@
 				83B83A6F1E68B2C6000331B3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
