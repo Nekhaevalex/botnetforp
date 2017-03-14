@@ -64,5 +64,6 @@ int startServer () {
 int main () {
     printf ("RainbowDash v1.0 Commander\n");
     startServer();
+    printf ("Hello, World!");
     return 0;
 }
