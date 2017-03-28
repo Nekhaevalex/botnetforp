@@ -53,7 +53,7 @@ int main(){
     serverAddr.sin_port = htons(7891);
     /* Set IP address to localhost */
     /*127.0.0.1*/
-    serverAddr.sin_addr.s_addr = inet_addr("10.55.122.10");
+    serverAddr.sin_addr.s_addr = inet_addr("172.20.10.4");
     /* Set all bits of the padding field to 0 */
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
     /*---- Establishing connection ----*/
@@ -66,6 +66,10 @@ int main(){
     while (w == 1) {
         recv(clientSocket, buffer, 1024, 0);
         printf ("%s\n", buffer);
+        for (int i = 0; i < 1024; i++)
+        {
+            buffer[i] = 0;
+        }
     }
     return 0;
 }
