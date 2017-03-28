@@ -11,6 +11,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <ifaddrs.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -18,7 +19,48 @@
 
 #define port	1100
 
-int startServer () {
+char** getServerIP () {
+    struct ifaddrs * ifAddrStruct=NULL;
+    struct ifaddrs * ifa=NULL;
+    void * tmpAddrPtr=NULL;
+    char** addrToRet;
+    addrToRet = malloc(sizeof(char*) * 6);
+    for (int j = 0; j<6; j++) {
+        addrToRet[j] = malloc(sizeof(char)*INET6_ADDRSTRLEN);
+    }
+    getifaddrs(&ifAddrStruct);
+    int ia = 0;
+    for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+        if (!ifa->ifa_addr) {
+            continue;
+        }
+        if (ifa->ifa_addr->sa_family == AF_INET) { // check it is IP4
+            // is a valid IP4 Address
+            tmpAddrPtr=&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+            char addressBuffer[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+            for (int i = 0; i<strlen(addressBuffer); i++) {
+                addrToRet[ia][i] = addressBuffer[i];
+            }
+            ia++;
+            printf("%s IP4 Adresse %s\n", ifa->ifa_name, addressBuffer);
+        } else if (ifa->ifa_addr->sa_family == AF_INET6) { // check it is IP6
+            // is a valid IP6 Address
+            tmpAddrPtr=&((struct sockaddr_in6 *)ifa->ifa_addr)->sin6_addr;
+            char addressBuffer[INET6_ADDRSTRLEN];
+            inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
+            for (int i = 0; i<strlen(addressBuffer); i++) {
+                addrToRet[ia][i] = addressBuffer[i];
+            }
+            ia++;
+            printf("%s IP6 Adresse %s\n", ifa->ifa_name, addressBuffer);
+        }
+    }
+    if (ifAddrStruct!=NULL) freeifaddrs(ifAddrStruct);
+    return addrToRet;
+}
+
+int startServer (char* ip) {
     /****************** SERVER CODE ****************/
     int welcomeSocket, newSocket;
     char buffer[1024];
@@ -36,13 +78,13 @@ int startServer () {
     /* Set port number, using htons function to use proper byte order */
     serverAddr.sin_port = htons(7891);
     /* Set IP address to localhost */
-    serverAddr.sin_addr.s_addr = inet_addr("10.55.122.10");
+    serverAddr.sin_addr.s_addr = inet_addr(ip);
     /* Set all bits of the padding field to 0 */
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
     
     /*---- Bind the address struct to the socket ----*/
     bind(welcomeSocket, (struct sockaddr *) &serverAddr, sizeof(serverAddr));
-    
+    printf("Server auf Adresse %s starten\n", ip);
     /*---- Listen on the socket, with 5 max connection requests queued ----*/
     if(listen(welcomeSocket,5)==0)
         printf("Hören...\n");
@@ -65,7 +107,9 @@ int startServer () {
 }
 
 int main () {
-    printf ("Das Ministerium für Informationsentwicklung des Dritten Reiches\n©1941 Berlin\n\n");
-    startServer();
+    printf ("Das Ministerium für Informationsentwicklung des Dritten Reiches\n©1941 Berlin\n\nDas Ponywurm\n\n");
+    char** addrToRet = getServerIP();
+    printf ("Serveradresse: %s\n", addrToRet[4]);
+    startServer(addrToRet[4]);
     return 0;
 }
