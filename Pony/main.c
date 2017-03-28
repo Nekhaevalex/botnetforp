@@ -66,9 +66,12 @@ char* receiveBroadcast () {
     printf("sendto Status = %d\n", status);
     
     shutdown(sock, 2);
+    close(sock);
     return buffer;
 }
-
+void parser(char* message) {
+    
+}
 int main(){
     char id[] = "botVlad";
     int clientSocket;
