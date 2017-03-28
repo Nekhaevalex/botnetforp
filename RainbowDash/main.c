@@ -16,9 +16,13 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include "parser.h"
 
 #define port	1100
 #define MAXBUF 65536
+
+int client;
+unsigned char hash[256];
 
 void broadcast (char* message) {
     int sock, status, buflen, sinlen;
@@ -57,8 +61,8 @@ void broadcast (char* message) {
     buflen = (int)strlen(buffer);
     status = (int)sendto(sock, buffer, buflen, 0, (struct sockaddr *)&sock_in, sinlen);
     printf("sendto Status = %d\n", status);
-    
     shutdown(sock, 2);
+    close(sock);
 }
 
 char** getServerIP () {
@@ -141,22 +145,45 @@ int startServer (char* ip) {
     printf("Verbindung mit %s etabliert\n", buffer);
     /*---- Send message to the socket of the incoming connection ----*/
     printf ("Nachricht:\n");
-    while (1) {
-        for (int i = 0; i<1024; i++) {
-            buffer[i] = 0;
-        }
-        scanf("%s", buffer);
-        send(newSocket, buffer, strlen(buffer), 0);
-    }
-    return 0;
+    //    while (1) {
+    //        for (int i = 0; i<1024; i++) {
+    //            buffer[i] = 0;
+    //        }
+    //        scanf("%s", buffer);
+    //        send(newSocket, buffer, strlen(buffer), 0);
+    //    }
+    return newSocket;
 }
+
+void parcer(char* cmd) {
+    char* cmd1 = brkFind(cmd, 1);
+    if (strcmp("hash", cmd1) == 0) {
+        send(client, "hash", 4, 0);
+        for (int i = 0; i<256; i++) {
+            char buf[15];
+            buf[0] = hash[i];
+            buf[1] = 0;
+            send(client, buf, strlen(buf), 0);
+        }
+    }
+};
 
 int main () {
     printf ("Das Ministerium für Informationsentwicklung des Dritten Reiches\n©1941 Berlin\n\n---Das Ponywurm---\n  \n");
+    for (int i = 0; i<256; i++) {
+        hash[i] = rand() % 256;
+    }
     char** addrToRet = getServerIP();
     printf ("Serveradresse: %s\n", addrToRet[4]);
     printf("Broadcasting Server Adresse...\n");
     broadcast(addrToRet[4]);
-    startServer(addrToRet[4]);
+    client = startServer(addrToRet[4]);
+    char buffer[256];
+    char w = 1;
+    while (w == 1) {
+        printf(">");
+        scanf("%s", buffer);
+        parcer (buffer);
+    }
     return 0;
 }
