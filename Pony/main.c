@@ -105,6 +105,8 @@ int main(){
     /*---- Read the message from the server into the buffer ----*/
     while (w == 1) {
         recv(clientSocket, buffer, 1024, 0);
+        if (strcmp(buffer, "quit") == 0)
+            close(clientSocket);
         printf ("%s\n", buffer);
         for (int i = 0; i < 1024; i++)
         {
