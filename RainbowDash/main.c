@@ -45,16 +45,19 @@ int startServer () {
     
     /*---- Listen on the socket, with 5 max connection requests queued ----*/
     if(listen(welcomeSocket,5)==0)
-        printf("Listening...\n");
+        printf("Hören...\n");
     else
-        printf("Error\n");
+        printf("Fehler\n");
     
     /*---- Accept call creates a new socket for the incoming connection ----*/
     addr_size = sizeof serverStorage;
     newSocket = accept(welcomeSocket, (struct sockaddr *) &serverStorage, &addr_size);
     /*---- Send message to the socket of the incoming connection ----*/
-    printf ("Message:\n");
+    printf ("Nachricht:\n");
     while (1) {
+        for (int i = 0; i<1024; i++) {
+            buffer[i] = 0;
+        }
         scanf("%s", buffer);
         send(newSocket, buffer, strlen(buffer), 0);
     }
@@ -62,8 +65,7 @@ int startServer () {
 }
 
 int main () {
-    printf ("RainbowDash v1.0 Commander\n");
+    printf ("Das Ministerium für Informationsentwicklung des Dritten Reiches\n©1941 Berlin\n\n");
     startServer();
-    printf ("Hello, World!");
     return 0;
 }
