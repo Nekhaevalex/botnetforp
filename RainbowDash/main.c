@@ -18,8 +18,51 @@
 #include <time.h>
 
 #define port	1100
+#define MAXBUF 65536
+
+void broadcast (char* message) {
+    int sock, status, buflen, sinlen;
+    char buffer[MAXBUF];
+    struct sockaddr_in sock_in;
+    int yes = 1;
+    
+    int port1 = 7892;
+    
+    sinlen = sizeof(struct sockaddr_in);
+    memset(&sock_in, 0, sinlen);
+    buflen = MAXBUF;
+    
+    sock = socket (PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    
+    sock_in.sin_addr.s_addr = htonl(INADDR_ANY);
+    sock_in.sin_port = htons(7892);
+    sock_in.sin_family = PF_INET;
+    
+    status = bind(sock, (struct sockaddr *)&sock_in, sinlen);
+    printf("Bind Status = %d\n", status);
+    
+    status = setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &yes, sizeof(int) );
+    printf("Setsockopt Status = %d\n", status);
+    
+    /* -1 = 255.255.255.255 this is a BROADCAST address,
+     a local broadcast address could also be used.
+     you can comput the local broadcat using NIC address and its NETMASK
+     */
+    
+    sock_in.sin_addr.s_addr=htonl(-1); /* send message to 255.255.255.255 */
+    sock_in.sin_port = htons(port1); /* port number */
+    sock_in.sin_family = PF_INET;
+    
+    sprintf(buffer, "%s", message);
+    buflen = (int)strlen(buffer);
+    status = (int)sendto(sock, buffer, buflen, 0, (struct sockaddr *)&sock_in, sinlen);
+    printf("sendto Status = %d\n", status);
+    
+    shutdown(sock, 2);
+}
 
 char** getServerIP () {
+    printf ("Serverinformation:\n");
     struct ifaddrs * ifAddrStruct=NULL;
     struct ifaddrs * ifa=NULL;
     void * tmpAddrPtr=NULL;
@@ -94,6 +137,8 @@ int startServer (char* ip) {
     /*---- Accept call creates a new socket for the incoming connection ----*/
     addr_size = sizeof serverStorage;
     newSocket = accept(welcomeSocket, (struct sockaddr *) &serverStorage, &addr_size);
+    recv(newSocket, buffer, 1024, 0);
+    printf("Verbindung mit %s etabliert\n", buffer);
     /*---- Send message to the socket of the incoming connection ----*/
     printf ("Nachricht:\n");
     while (1) {
@@ -107,9 +152,11 @@ int startServer (char* ip) {
 }
 
 int main () {
-    printf ("Das Ministerium für Informationsentwicklung des Dritten Reiches\n©1941 Berlin\n\nDas Ponywurm\n\n");
+    printf ("Das Ministerium für Informationsentwicklung des Dritten Reiches\n©1941 Berlin\n\n---Das Ponywurm---\n  \n");
     char** addrToRet = getServerIP();
     printf ("Serveradresse: %s\n", addrToRet[4]);
+    printf("Broadcasting Server Adresse...\n");
+    broadcast(addrToRet[4]);
     startServer(addrToRet[4]);
     return 0;
 }
