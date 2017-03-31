@@ -16,7 +16,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
-#include "parcer.h"
+#include "parser.h"
 
 #define port	1100
 #define MAXBUF 65536
@@ -131,27 +131,20 @@ int startServer (char* ip) {
     
     /*---- Bind the address struct to the socket ----*/
     bind(welcomeSocket, (struct sockaddr *) &serverAddr, sizeof(serverAddr));
-    printf("Server auf Adresse %s starten\n", ip);
+    printf("Server on %s started\n", ip);
     /*---- Listen on the socket, with 5 max connection requests queued ----*/
     if(listen(welcomeSocket,5)==0)
-        printf("Hören...\n");
+        printf("Listening...\n");
     else
-        printf("Fehler\n");
+        printf("Error\n");
     
     /*---- Accept call creates a new socket for the incoming connection ----*/
     addr_size = sizeof serverStorage;
     newSocket = accept(welcomeSocket, (struct sockaddr *) &serverStorage, &addr_size);
     recv(newSocket, buffer, 1024, 0);
-    printf("Verbindung mit %s etabliert\n", buffer);
+    printf("Connection with %s established\n", buffer);
     /*---- Send message to the socket of the incoming connection ----*/
-    printf ("Nachricht:\n");
-    //    while (1) {
-    //        for (int i = 0; i<1024; i++) {
-    //            buffer[i] = 0;
-    //        }
-    //        scanf("%s", buffer);
-    //        send(newSocket, buffer, strlen(buffer), 0);
-    //    }
+    printf ("Ready for transmission\n");
     return newSocket;
 }
 
@@ -169,21 +162,22 @@ void parcer(char* cmd) {
 };
 
 int main () {
-    printf ("Das Ministerium für Informationsentwicklung des Dritten Reiches\n©1941 Berlin\n\n---Das Ponywurm---\n  \n");
+    printf ("Pony worm commander\n");
     for (int i = 0; i<256; i++) {
         hash[i] = rand() % 256;
     }
     char** addrToRet = getServerIP();
-    printf ("Serveradresse: %s\n", addrToRet[4]);
-    printf("Broadcasting Server Adresse...\n");
+    printf ("Server Address: %s\n", addrToRet[4]);
+    printf("Broadcasting Server Address...\n");
     broadcast(addrToRet[4]);
     client = startServer(addrToRet[4]);
     char buffer[256];
     char w = 1;
+    printf ("Waiting for input\n");
     while (w == 1) {
         printf(">");
         scanf("%s", buffer);
-        parcer (buffer);
+        parcer(buffer);
     }
     return 0;
 }
