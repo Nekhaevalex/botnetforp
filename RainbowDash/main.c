@@ -150,6 +150,9 @@ int startServer (char* ip) {
 
 void parcer(char* cmd) {
     char* cmd1 = brkFind(cmd, 1);
+    if (strcmp("locate", cmd1) == 0) {
+        //broadcast();
+    }
     if (strcmp("hash", cmd1) == 0) {
         send(client, "hash", 4, 0);
         for (int i = 0; i<256; i++) {
