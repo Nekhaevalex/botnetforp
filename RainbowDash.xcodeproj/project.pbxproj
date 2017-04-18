@@ -62,8 +62,8 @@
 			isa = PBXGroup;
 			children = (
 				83B83A731E68C258000331B3 /* colors.h */,
-				FA65BFE51E8AD56C0039FA06 /* parser.c */,
 				FA65BFE61E8AD56C0039FA06 /* parser.h */,
+				FA65BFE51E8AD56C0039FA06 /* parser.c */,
 				83B83A691E68B2C6000331B3 /* main.c */,
 			);
 			path = RainbowDash;
@@ -177,6 +177,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-lmenu",
+					"-lncurses",
+				);
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -217,6 +221,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = (
+					"-lmenu",
+					"-lncurses",
+				);
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -224,6 +232,7 @@
 		83B83A6E1E68B2C6000331B3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;

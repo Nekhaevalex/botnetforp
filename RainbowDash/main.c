@@ -17,6 +17,8 @@
 #include <unistd.h>
 #include <time.h>
 #include "parser.h"
+#include <curses.h>
+#include <menu.h>
 
 #define port	1100
 #define MAXBUF 65536
@@ -66,7 +68,7 @@ void broadcast (char* message) {
 }
 
 char** getServerIP () {
-    printf ("Serverinformation:\n");
+    printf ("Server information:\n");
     struct ifaddrs * ifAddrStruct=NULL;
     struct ifaddrs * ifa=NULL;
     void * tmpAddrPtr=NULL;
@@ -90,7 +92,7 @@ char** getServerIP () {
                 addrToRet[ia][i] = addressBuffer[i];
             }
             ia++;
-            printf("%s IP4 Adresse %s\n", ifa->ifa_name, addressBuffer);
+            printf("%s IP4 Adress %s\n", ifa->ifa_name, addressBuffer);
         } else if (ifa->ifa_addr->sa_family == AF_INET6) { // check it is IP6
             // is a valid IP6 Address
             tmpAddrPtr=&((struct sockaddr_in6 *)ifa->ifa_addr)->sin6_addr;
@@ -100,7 +102,7 @@ char** getServerIP () {
                 addrToRet[ia][i] = addressBuffer[i];
             }
             ia++;
-            printf("%s IP6 Adresse %s\n", ifa->ifa_name, addressBuffer);
+            printf("%s IP6 Adress %s\n", ifa->ifa_name, addressBuffer);
         }
     }
     if (ifAddrStruct!=NULL) freeifaddrs(ifAddrStruct);
@@ -148,39 +150,44 @@ int startServer (char* ip) {
     return newSocket;
 }
 
-void parcer(char* cmd) {
-    char* cmd1 = brkFind(cmd, 1);
-    if (strcmp("locate", cmd1) == 0) {
-        //broadcast();
+void info() {
+    
+}
+
+void processor(unsigned long int code) {
+    unsigned long int workingCopy = code;
+    //transcode to string
+    char line[20];
+    int i = 0;
+    for (int i = 0; i<20; i++) {
+        line[i] = 0;
     }
-    if (strcmp("hash", cmd1) == 0) {
-        send(client, "hash", 4, 0);
-        for (int i = 0; i<256; i++) {
-            char buf[15];
-            buf[0] = hash[i];
-            buf[1] = 0;
-            send(client, buf, strlen(buf), 0);
+    while (workingCopy != 0) {
+        line[i] = '0'+workingCopy % 10;
+        workingCopy = workingCopy/10;
+        i++;
+    }
+    bool flag = false;
+    bool ui = false;
+    for (int i = 0; i<20; i++) {
+        if (line[i] == 7) {
+            flag = true;
         }
+        if (line[i] == 8) {
+            flag = false;
+        }
+        if (line [i] == 5) {
+            info();
+        }
+        
     }
-};
+}
 
 int main () {
-    printf ("Pony worm commander\n");
-    for (int i = 0; i<256; i++) {
-        hash[i] = rand() % 256;
-    }
-    char** addrToRet = getServerIP();
-    printf ("Server Address: %s\n", addrToRet[4]);
-    printf("Broadcasting Server Address...\n");
-    broadcast(addrToRet[4]);
-    client = startServer(addrToRet[4]);
-    char buffer[256];
-    char w = 1;
-    printf ("Waiting for input\n");
-    while (w == 1) {
-        printf(">");
-        scanf("%s", buffer);
-        parcer(buffer);
-    }
+    printf ("Worm commander\n");
+    string cmd = inputString();
+    unsigned long int toSend = 0;
+    toSend = commander(cmd);
+    processor(toSend);
     return 0;
 }
