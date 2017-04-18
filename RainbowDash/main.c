@@ -150,8 +150,9 @@ int startServer (char* ip) {
     return newSocket;
 }
 
-void info() {
-    
+unsigned long int info() {
+    char** serverIP = getServerIP();
+    return serverIP;
 }
 
 void processor(unsigned long int code) {
@@ -169,22 +170,22 @@ void processor(unsigned long int code) {
     }
     bool flag = false;
     bool ui = false;
+    unsigned long int var = 0;
     for (int i = 0; i<20; i++) {
-        if (line[i] == 7) {
+        if (line[i] == '7') {
             flag = true;
         }
-        if (line[i] == 8) {
+        if (line[i] == '8') {
             flag = false;
         }
-        if (line [i] == 5) {
-            info();
+        if (line [i] == '5') {
+            var = info();
         }
         
     }
 }
 
 int main () {
-    printf ("Worm commander\n");
     string cmd = inputString();
     unsigned long int toSend = 0;
     toSend = commander(cmd);
