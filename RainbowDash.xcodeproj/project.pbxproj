@@ -62,8 +62,8 @@
 			isa = PBXGroup;
 			children = (
 				83B83A731E68C258000331B3 /* colors.h */,
-				FA21706F1EA6A38A0096882F /* parser.c */,
 				FA2170701EA6A38A0096882F /* parser.h */,
+				FA21706F1EA6A38A0096882F /* parser.c */,
 				83B83A691E68B2C6000331B3 /* main.c */,
 			);
 			path = RainbowDash;

@@ -10,7 +10,7 @@
 
 typedef enum commands {
     nil,
-    self,
+    print,
     start,
     sendc,
     request,
@@ -20,7 +20,15 @@ typedef enum commands {
     msg,
     on,
     off,
-    ui,
+    exec,
+    var,
+    broadcast,
+    line,
+    sends,
+    constant,
+    readconst,
+    freemem,
+    help,
 } commands;
 
 char* inputString() {
@@ -102,7 +110,7 @@ int interprete(char* lexem) {
     if (strcmp(lexem, "sendc")==0){
         return sendc;
     }
-    else if (strcmp(lexem, "request")==0) {
+    else if (strcmp(lexem, "recieve")==0) {
         return request;
     }
     else if (strcmp(lexem, "file")==0) {
@@ -114,8 +122,8 @@ int interprete(char* lexem) {
     else if (strcmp(lexem, "msg")==0) {
         return msg;
     }
-    else if (strcmp(lexem, "self")==0) {
-        return self;
+    else if (strcmp(lexem, "print")==0) {
+        return print;
     }
     else if (strcmp(lexem, "start")==0) {
         return start;
@@ -126,11 +134,35 @@ int interprete(char* lexem) {
     else if (strcmp(lexem, "off")==0) {
         return off;
     }
-    else if (strcmp(lexem, "ui")==0) {
-        return ui;
+    else if (strcmp(lexem, "exec")==0) {
+        return exec;
     }
     else if (strcmp(lexem, "save")==0) {
         return save;
+    }
+    else if (strcmp(lexem, "var")==0) {
+        return var;
+    }
+    else if (strcmp(lexem, "broadcast")==0) {
+        return broadcast;
+    }
+    else if (strcmp(lexem, "line") == 0) {
+        return line;
+    }
+    else if (strcmp(lexem, "sends") == 0) {
+        return sends;
+    }
+    else if (strcmp(lexem, "const") == 0) {
+        return constant;
+    }
+    else if (strcmp(lexem, "statvar") == 0) {
+        return readconst;
+    }
+    else if (strcmp(lexem, "free") == 0) {
+        return freemem;
+    }
+    else if (strcmp(lexem, "help") == 0) {
+        return help;
     }
     else {
         return nil;
@@ -151,7 +183,7 @@ unsigned long int commander(char* cmd) {
         string cache = wordFinder(cmd, i+1);
         c = interprete(cache);
         if (c>9) {
-            set=set*1000+c*1000;
+            set=set*100+(c-10)*10;
         }
         else {
             set=set*10+c;

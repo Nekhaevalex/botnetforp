@@ -23,8 +23,14 @@
 #define port	1100
 #define MAXBUF 65536
 
-int client;
+int client = 0;
 unsigned char hash[256];
+
+char* buffer = NULL;
+bool flag = false;
+bool ui = false;
+char* var = NULL;
+char* constant = NULL;
 
 void broadcast (char* message) {
     int sock, status, buflen, sinlen;
@@ -67,8 +73,8 @@ void broadcast (char* message) {
     close(sock);
 }
 
-char** getServerIP () {
-    printf ("Server information:\n");
+char* getServerIP () {
+    //printf ("Server information:\n");
     struct ifaddrs * ifAddrStruct=NULL;
     struct ifaddrs * ifa=NULL;
     void * tmpAddrPtr=NULL;
@@ -92,7 +98,7 @@ char** getServerIP () {
                 addrToRet[ia][i] = addressBuffer[i];
             }
             ia++;
-            printf("%s IP4 Adress %s\n", ifa->ifa_name, addressBuffer);
+            //printf("%s IP4 Adress %s\n", ifa->ifa_name, addressBuffer);
         } else if (ifa->ifa_addr->sa_family == AF_INET6) { // check it is IP6
             // is a valid IP6 Address
             tmpAddrPtr=&((struct sockaddr_in6 *)ifa->ifa_addr)->sin6_addr;
@@ -102,16 +108,16 @@ char** getServerIP () {
                 addrToRet[ia][i] = addressBuffer[i];
             }
             ia++;
-            printf("%s IP6 Adress %s\n", ifa->ifa_name, addressBuffer);
+            //printf("%s IP6 Adress %s\n", ifa->ifa_name, addressBuffer);
         }
     }
     if (ifAddrStruct!=NULL) freeifaddrs(ifAddrStruct);
-    return addrToRet;
+    return addrToRet[4];
 }
 
 int startServer (char* ip) {
     /****************** SERVER CODE ****************/
-    int welcomeSocket, newSocket;
+    int welcomeSocket;
     char buffer[1024];
     struct sockaddr_in serverAddr;
     struct sockaddr_storage serverStorage;
@@ -142,17 +148,12 @@ int startServer (char* ip) {
     
     /*---- Accept call creates a new socket for the incoming connection ----*/
     addr_size = sizeof serverStorage;
-    newSocket = accept(welcomeSocket, (struct sockaddr *) &serverStorage, &addr_size);
-    recv(newSocket, buffer, 1024, 0);
+    client = accept(welcomeSocket, (struct sockaddr *) &serverStorage, &addr_size);
+    recv(client, buffer, 1024, 0);
     printf("Connection with %s established\n", buffer);
     /*---- Send message to the socket of the incoming connection ----*/
     printf ("Ready for transmission\n");
-    return newSocket;
-}
-
-unsigned long int info() {
-    char** serverIP = getServerIP();
-    return serverIP;
+    return client;
 }
 
 void processor(unsigned long int code) {
@@ -168,27 +169,78 @@ void processor(unsigned long int code) {
         workingCopy = workingCopy/10;
         i++;
     }
-    bool flag = false;
-    bool ui = false;
-    unsigned long int var = 0;
     for (int i = 0; i<20; i++) {
-        if (line[i] == '7') {
+        if (line[i] == '1') {
+            printf("%s\n", buffer);
+        }
+        if (line[i] == '4') {
+            recv(client, buffer, 1024, 0);
+        }
+        if (line[i] == '9') {
             flag = true;
         }
         if (line[i] == '8') {
-            flag = false;
+            buffer = inputString();
         }
-        if (line [i] == '5') {
-            var = info();
+        if (line [i] == '7') {
+            buffer = getServerIP();
         }
-        
+        if (line[i] == '2') {
+            startServer(buffer);
+        }
+        if (line[i] == '6') {
+            var = buffer;
+        }
+        if (line[i] == '3') {
+            send(client, line, strlen(line)-1, 0);
+            break;
+        }
+        if (line[i] == '0') {
+            if (line[i+1] == '0') {
+                flag = false;
+            }
+            if (line[i+1] == '1') {
+                ui = flag;
+            }
+            if (line[i+1] == '2') {
+                buffer = var;
+            }
+            if (line[i+1] == '3') {
+                broadcast(buffer);
+            }
+            if (line[i+1] == '4') {
+                buffer = line;
+            }
+            if (line[i+1] == '5') {
+                send(client, buffer, strlen(buffer), 0);
+            }
+            if (line[i+1] == '6') {
+                constant = malloc(sizeof(char)*strlen(buffer));
+                for (int i = 0; i<strlen(buffer); i++) {
+                    constant[i] = buffer[i];
+                }
+            }
+            if (line[i+1] == '7') {
+                buffer = constant;
+            }
+            if (line[i+1] == '8') {
+                free(constant);
+            }
+            if (line[i+1] == '9') {
+                buffer = "RainbowDash Commander version 2\n Command reference:\nprint,\nstart,\nsendc,\nrequest,\nfile,\nsave,\ninfo,\nmsg,\non,\noff,\nexec,\nvar,\nbroadcast,\nline,\nsends,\nconstant,\nreadconst,\nfreemem\n";
+            }
+            i++;
+        }
     }
 }
 
 int main () {
-    string cmd = inputString();
+    printf ("©2017 MIPT\n");
     unsigned long int toSend = 0;
-    toSend = commander(cmd);
-    processor(toSend);
+    while (1==1) {
+        string cmd = inputString();
+        toSend = commander(cmd);
+        processor(toSend);
+    }
     return 0;
 }
